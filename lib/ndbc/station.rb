@@ -33,6 +33,10 @@ module NDBC
       @connection = Connection.new
     end
 
+    def self.test_mauro
+        return "peppo"
+    end
+    
     def inspect
       "#{id} (lat: #{@location[:latitude]}, lon: #{@location[:longitude]})"
     end
