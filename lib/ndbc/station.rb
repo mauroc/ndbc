@@ -9,6 +9,10 @@ module NDBC
       def all
         NDBC::StationTable.station_table_data.map { |data| new(data[:id].upcase, data) }
       end
+
+      def get_stations_hash
+        NDBC::StationTable.station_table_data.inject({}) {|h, data| h.merge!(data[:id] => data) }
+      end
     end
 
     attr_accessor :id, :connection
@@ -33,9 +37,6 @@ module NDBC
       @connection = Connection.new
     end
 
-    def self.test_mauro
-        return "peppo"
-    end
     
     def inspect
       "#{id} (lat: #{@location[:latitude]}, lon: #{@location[:longitude]})"

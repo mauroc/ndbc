@@ -1,3 +1,4 @@
+
 module NDBC
   module LatestObs
     class << self
@@ -7,43 +8,50 @@ module NDBC
         rows.map do |observation|
           obs_parts = cleanup_parts!(observation.split(' '))
 
-          {
-            id:       obs_parts[0],
-            lat:      obs_parts[1].try(:to_f),
-            lng:      obs_parts[2].try(:to_f),
-            year:     obs_parts[3].try(:to_i),
-            month:    obs_parts[4].try(:to_i),
-            day:      obs_parts[5].try(:to_i),
-            hour:     obs_parts[6].try(:to_i),
-            minute:   obs_parts[7].try(:to_i),
-            wdir:     obs_parts[8].try(:to_f),
-            wspd:     obs_parts[9].try(:to_f),
-            gst:      obs_parts[10].try(:to_f),
-            wvht:     obs_parts[11].try(:to_f),
-            dpd:      obs_parts[12].try(:to_f),
-            apd:      obs_parts[13].try(:to_f),
-            mwd:      obs_parts[14].try(:to_f),
-            pres:     obs_parts[15].try(:to_f),
-            ptdy:     obs_parts[16].try(:to_f),
-            atmp:     obs_parts[17].try(:to_f),
-            wtmp:     obs_parts[18].try(:to_f),
-            dewp:     obs_parts[19].try(:to_f),
-            vis:      obs_parts[20].try(:to_f),
-            tide:     obs_parts[21].try(:to_f)
+          h = {
+            id:       conv_or_nil(obs_parts[0], :to_s),
+            lat:      conv_or_nil(obs_parts[1], :to_f),
+            lng:      conv_or_nil(obs_parts[2], :to_f),
+            year:     conv_or_nil(obs_parts[3], :to_i),
+            month:    conv_or_nil(obs_parts[4], :to_i),
+            day:      conv_or_nil(obs_parts[5], :to_i),
+            hour:     conv_or_nil(obs_parts[6], :to_i),
+            minute:   conv_or_nil(obs_parts[7], :to_i),
+            wdir:     conv_or_nil(obs_parts[8], :to_f),
+            wspd:     conv_or_nil(obs_parts[9], :to_f),
+            gst:      conv_or_nil(obs_parts[10], :to_f),
+            wvht:     conv_or_nil(obs_parts[11], :to_f),
+            dpd:      conv_or_nil(obs_parts[12], :to_f),
+            apd:      conv_or_nil(obs_parts[13], :to_f),
+            mwd:      conv_or_nil(obs_parts[14], :to_f),
+            pres:     conv_or_nil(obs_parts[15], :to_f),
+            ptdy:     conv_or_nil(obs_parts[16], :to_f),
+            atmp:     conv_or_nil(obs_parts[17], :to_f),
+            wtmp:     conv_or_nil(obs_parts[18], :to_f),
+            dewp:     conv_or_nil(obs_parts[19], :to_f),
+            vis:      conv_or_nil(obs_parts[20], :to_f),
+            tide:     conv_or_nil(obs_parts[21], :to_f)
           }
+          # times in latest_obs.txt  file are UTC: https://www.ndbc.noaa.gov/measdes.shtml
+          h[:obs_time] = Time.new(h[:year], h[:month], h[:day], h[:hour], h[:minute], 0 , "+00:00")
+          h
         end
       end
 
       private
 
-      def cleanup_parts!(obs_parts)
-        obs_parts.map! do |part|
-          part = part.gsub('&nbsp;', ' ')
-          part = part.strip unless part.nil?
-          part = (part == '' || part == '?') ? nil : part
-          part
+        def conv_or_nil(str, op)
+            str.downcase == 'mm' ? nil : str.try(op)
         end
-      end
+
+        def cleanup_parts!(obs_parts)
+            obs_parts.map! do |part|
+            part = part.gsub('&nbsp;', ' ')
+            part = part.strip unless part.nil?
+            part = (part == '' || part == '?') ? nil : part
+            part
+            end
+        end
 
     end
   end
