@@ -24,7 +24,7 @@ module NDBC
     def initialize(id, station_data = {})
       @id = id.to_s
       @owner = station_data[:owner]
-      @ttype = station_data[:ttype]
+      @ttype = station_data[:ttype] || station_data[:type]
       @hull = station_data[:hull]
       @name = station_data[:name]
       @payload = station_data[:payload]
