@@ -11,7 +11,7 @@ module NDBC
         end
 
         def get_stations_hash
-            NDBC::StationTable.station_table_data.inject({}) {|h, data| h.merge!(data[:id].upcase => data.except(:id) }
+            NDBC::StationTable.station_table_data.inject({}) {|h, data| h.merge!(data[:id].upcase => data.except(:id)) }
         end
 
         def ship_data(last_update)
