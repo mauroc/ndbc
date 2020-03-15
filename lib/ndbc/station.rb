@@ -6,13 +6,21 @@ module NDBC
     include NDBC::StationTable
 
     class << self
-      def all
-        NDBC::StationTable.station_table_data.map { |data| new(data[:id].upcase, data) }
-      end
+        def all
+            NDBC::StationTable.station_table_data.map { |data| new(data[:id].upcase, data) }
+        end
 
-      def get_stations_hash
-        NDBC::StationTable.station_table_data.inject({}) {|h, data| h.merge!(data[:id].upcase => data) }
-      end
+        def get_stations_hash
+            NDBC::StationTable.station_table_data.inject({}) {|h, data| h.merge!(data[:id].upcase => data.except(:id) }
+        end
+
+        def ship_data(last_update)
+            k = "ship_obs"
+            ships = Station.new(k)
+            values = ships.standard_meteorological_data[:values]
+            values.select {|v| DateTime.new(v["YY"].to_i, v["MM"].to_i,  v["DD"].to_i, v["hh"].to_i) > last_update}
+        end
+
     end
 
     attr_accessor :id, :connection
@@ -39,7 +47,7 @@ module NDBC
 
     
     def inspect
-      "#{id} (lat: #{@location[:latitude]}, lon: #{@location[:longitude]})"
+      "#{id} (lat: #{@location[:latitude]}, lon: #{@location[:longitude]} active: #{@active}) type: #{@ttype}"
     end
 
     def standard_meteorological_data
